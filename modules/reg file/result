@@ -1,0 +1,7 @@
+Time=10: clk=1 we=0 ra1=0 ra2=0 wa=0 wd=00000000 rd1=00000000 rd2=00000000
+Time=20: clk=1 we=1 ra1=0 ra2=0 wa=1 wd=0000000A rd1=00000000 rd2=00000000
+Time=30: clk=1 we=0 ra1=1 ra2=0 wa=1 wd=0000000A rd1=0000000A rd2=00000000
+Time=40: clk=1 we=1 ra1=1 ra2=0 wa=2 wd=00000014 rd1=0000000A rd2=00000000
+Time=50: clk=1 we=0 ra1=1 ra2=2 wa=2 wd=00000014 rd1=0000000A rd2=00000014
+Time=60: clk=1 we=1 ra1=1 ra2=2 wa=0 wd=FFFFFFFF rd1=0000000A rd2=00000014
+Time=70: clk=1 we=0 ra1=0 ra2=2 wa=0 wd=FFFFFFFF rd1=00000000 rd2=00000014
