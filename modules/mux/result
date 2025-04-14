@@ -1,0 +1,2 @@
+Time=0:  reg_data=0000000A imm_data=00000014 alu_src=0 out=0000000A
+Time=10: reg_data=0000000A imm_data=00000014 alu_src=1 out=00000014
