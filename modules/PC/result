@@ -1,0 +1,4 @@
+Time=10: clk=1 reset=1 pc_in=00000000 pc_out=00000000
+Time=20: clk=1 reset=0 pc_in=00000004 pc_out=00000004
+Time=30: clk=1 reset=0 pc_in=00000008 pc_out=00000008
+Time=40: clk=1 reset=1 pc_in=00000008 pc_out=00000000
