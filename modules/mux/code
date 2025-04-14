@@ -1,0 +1,7 @@
+module mux_alu_src (
+    input wire [31:0] reg_data, imm_data,
+    input wire alu_src,
+    output wire [31:0] out
+);
+    assign out = alu_src ? imm_data : reg_data;
+endmodule
