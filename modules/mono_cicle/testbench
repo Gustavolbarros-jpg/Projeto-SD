@@ -1,0 +1,42 @@
+`timescale 1ns / 1ps
+module tb_mips_mono_simple;
+    reg clk, reset;
+
+    // Instantiate the module
+    mips_mono_simple uut (
+        .clk(clk),
+        .reset(reset)
+    );
+
+    // Clock generation
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    // Test stimulus
+    initial begin
+        $monitor("Time=%0t clk=%b reset=%b PC=%h Instruction=%h",
+                 $time, clk, reset, uut.pc_out, uut.instruction);
+
+        // Test 1: Reset active, expect PC = 0, Instruction undefined or 0
+        reset = 1;
+        #10;
+        // Expected: PC = 32'h00000000, Instruction = 32'h00000000 or undefined
+
+        // Test 2: Release reset, expect PC increments and instructions fetched
+        reset = 0;
+        #10;
+        // Expected: PC = 32'h00000000, Instruction = 32'h2001000A (addi $1, $0, 10)
+        #10;
+        // Expected: PC = 32'h00000004, Instruction = 32'h20020014 (addi $2, $0, 20)
+        #10;
+        // Expected: PC = 32'h00000008, Instruction = 32'h20030032 (addi $3, $0, 50)
+        #10;
+        // Expected: PC = 32'h0000000C, Instruction = 32'hAC010000 (sw $1, 0($0))
+        #10;
+        // Expected: PC = 32'h00000010, Instruction = 32'h00220820 (add $1, $1, $2)
+
+        $finish;
+    end
+endmodule
