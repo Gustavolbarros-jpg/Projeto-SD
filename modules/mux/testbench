@@ -1,0 +1,43 @@
+module mux_alu_src (
+    input wire [31:0] reg_data, imm_data,
+    input wire alu_src,
+    output wire [31:0] out
+);
+    assign out = alu_src ? imm_data : reg_data;
+endmodule
+..................................................................
+`timescale 1ns / 1ps
+module tb_mux_alu_src;
+    reg [31:0] reg_data, imm_data;
+    reg alu_src;
+    wire [31:0] out;
+
+    // Instantiate the module
+    mux_alu_src uut (
+        .reg_data(reg_data),
+        .imm_data(imm_data),
+        .alu_src(alu_src),
+        .out(out)
+    );
+
+    // Test stimulus
+    initial begin
+        $monitor("Time=%0t reg_data=%h imm_data=%h alu_src=%b out=%h",
+                 $time, reg_data, imm_data, alu_src, out);
+
+        reg_data = 32'h0000000A;
+        imm_data = 32'h00000014;
+
+        // Test 1: alu_src = 0, expect out = reg_data
+        alu_src = 0;
+        #10;
+        // Expected: out = 32'h0000000A
+
+        // Test 2: alu_src = 1, expect out = imm_data
+        alu_src = 1;
+        #10;
+        // Expected: out = 32'h00000014
+
+        $finish;
+    end
+endmodule
