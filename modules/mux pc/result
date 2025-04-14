@@ -1,0 +1,4 @@
+Time=0:  pc_plus_4=00000004 branch_addr=00000010 branch=0 zero=0 pc_next=00000004
+Time=10: pc_plus_4=00000004 branch_addr=00000010 branch=1 zero=0 pc_next=00000004
+Time=20: pc_plus_4=00000004 branch_addr=00000010 branch=1 zero=1 pc_next=00000010
+Time=30: pc_plus_4=00000004 branch_addr=00000010 branch=0 zero=1 pc_next=00000004
