@@ -1,0 +1,33 @@
+`timescale 1ns / 1ps
+module tb_pc_adder;
+    reg [31:0] pc_current;
+    wire [31:0] pc_next;
+
+    // Instantiate the module
+    pc_adder uut (
+        .pc_current(pc_current),
+        .pc_next(pc_next)
+    );
+
+    // Test stimulus
+    initial begin
+        $monitor("Time=%0t pc_current=%h pc_next=%h", $time, pc_current, pc_next);
+
+        // Test 1: pc_current = 0, expect pc_next = 4
+        pc_current = 32'h00000000;
+        #10;
+        // Expected: pc_next = 32'h00000004
+
+        // Test 2: pc_current = 4, expect pc_next = 8
+        pc_current = 32'h00000004;
+        #10;
+        // Expected: pc_next = 32'h00000008
+
+        // Test 3: pc_current = FFFFFFF0, expect pc_next = FFFFFFF4
+        pc_current = 32'hFFFFFFF0;
+        #10;
+        // Expected: pc_next = 32'hFFFFFFF4
+
+        $finish;
+    end
+endmodule
