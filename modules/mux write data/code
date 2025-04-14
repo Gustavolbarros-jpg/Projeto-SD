@@ -1,0 +1,7 @@
+module mux_write_data (
+    input wire [31:0] alu_result, mem_data,
+    input wire mem_to_reg,
+    output wire [31:0] out
+);
+    assign out = mem_to_reg ? mem_data : alu_result;
+endmodule
