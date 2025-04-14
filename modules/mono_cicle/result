@@ -1,0 +1,6 @@
+Time=10: clk=1 reset=1 PC=00000000 Instruction=00000000
+Time=20: clk=1 reset=0 PC=00000000 Instruction=2001000A
+Time=30: clk=1 reset=0 PC=00000004 Instruction=20020014
+Time=40: clk=1 reset=0 PC=00000008 Instruction=20030032
+Time=50: clk=1 reset=0 PC=0000000C Instruction=AC010000
+Time=60: clk=1 reset=0 PC=00000010 Instruction=00220820
