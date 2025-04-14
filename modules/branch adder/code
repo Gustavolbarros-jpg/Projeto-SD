@@ -1,0 +1,6 @@
+module branch_adder (
+    input wire [31:0] pc_plus_4, imm_shifted,
+    output wire [31:0] branch_addr
+);
+    assign branch_addr = pc_plus_4 + imm_shifted;
+endmodule
