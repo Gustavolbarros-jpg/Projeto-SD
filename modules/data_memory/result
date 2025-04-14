@@ -1,0 +1,5 @@
+Time=10: clk=1 mem_write=0 mem_read=0 address=00000000 write_data=00000000 read_data=00000000
+Time=20: clk=1 mem_write=1 mem_read=0 address=00000000 write_data=0000000A read_data=00000000
+Time=30: clk=1 mem_write=0 mem_read=1 address=00000000 write_data=0000000A read_data=0000000A
+Time=40: clk=1 mem_write=1 mem_read=0 address=00000004 write_data=00000014 read_data=00000000
+Time=50: clk=1 mem_write=0 mem_read=1 address=00000004 write_data=00000014 read_data=00000014
