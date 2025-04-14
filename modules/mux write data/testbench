@@ -1,0 +1,35 @@
+`timescale 1ns / 1ps
+module tb_mux_write_data;
+    reg [31:0] alu_result, mem_data;
+    reg mem_to_reg;
+    wire [31:0] out;
+
+    // Instantiate the module
+    mux_write_data uut (
+        .alu_result(alu_result),
+        .mem_data(mem_data),
+        .mem_to_reg(mem_to_reg),
+        .out(out)
+    );
+
+    // Test stimulus
+    initial begin
+        $monitor("Time=%0t alu_result=%h mem_data=%h mem_to_reg=%b out=%h",
+                 $time, alu_result, mem_data, mem_to_reg, out);
+
+        alu_result = 32'h0000000A;
+        mem_data = 32'h00000014;
+
+        // Test 1: mem_to_reg = 0, expect out = alu_result
+        mem_to_reg = 0;
+        #10;
+        // Expected: out = 32'h0000000A
+
+        // Test 2: mem_to_reg = 1, expect out = mem_data
+        mem_to_reg = 1;
+        #10;
+        // Expected: out = 32'h00000014
+
+        $finish;
+    end
+endmodule
