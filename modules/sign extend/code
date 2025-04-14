@@ -1,38 +1,6 @@
-`timescale 1ns / 1ps
-module tb_sign_extend;
-    reg [15:0] in;
-    wire [31:0] out;
-
-    // Instantiate the module
-    sign_extend uut (
-        .in(in),
-        .out(out)
-    );
-
-    // Test stimulus
-    initial begin
-        $monitor("Time=%0t in=%h out=%h", $time, in, out);
-
-        // Test 1: Positive value, expect zero-extended
-        in = 16'h000A;
-        #10;
-        // Expected: out = 32'h0000000A
-
-        // Test 2: Negative value (-1), expect sign-extended
-        in = 16'hFFFF;
-        #10;
-        // Expected: out = 32'hFFFFFFFF
-
-        // Test 3: Negative value (-32768), expect sign-extended
-        in = 16'h8000;
-        #10;
-        // Expected: out = 32'hFFFF8000
-
-        // Test 4: Positive max value, expect zero-extended
-        in = 16'h7FFF;
-        #10;
-        // Expected: out = 32'h00007FFF
-
-        $finish;
-    end
+module sign_extend (
+    input wire [15:0] in,
+    output wire [31:0] out
+);
+    assign out = {{16{in[15]}}, in};
 endmodule
