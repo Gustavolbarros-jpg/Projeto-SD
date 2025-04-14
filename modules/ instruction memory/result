@@ -1,0 +1,4 @@
+Time=0:  address=00000000 instruction=2001000A
+Time=10: address=00000004 instruction=20020014
+Time=20: address=00000008 instruction=20030032
+Time=30: address=00000010 instruction=00220820
