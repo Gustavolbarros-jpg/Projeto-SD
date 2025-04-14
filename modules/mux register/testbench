@@ -1,0 +1,34 @@
+`timescale 1ns / 1ps
+module tb_mux_write_reg;
+    reg [4:0] rt, rd;
+    reg reg_dst;
+    wire [4:0] out;
+
+    // Instantiate the module
+    mux_write_reg uut (
+        .rt(rt),
+        .rd(rd),
+        .reg_dst(reg_dst),
+        .out(out)
+    );
+
+    // Test stimulus
+    initial begin
+        $monitor("Time=%0t rt=%d rd=%d reg_dst=%b out=%d", $time, rt, rd, reg_dst, out);
+
+        rt = 5'd10;
+        rd = 5'd20;
+
+        // Test 1: reg_dst = 0, expect out = rt
+        reg_dst = 0;
+        #10;
+        // Expected: out = 5'd10
+
+        // Test 2: reg_dst = 1, expect out = rd
+        reg_dst = 1;
+        #10;
+        // Expected: out = 5'd20
+
+        $finish;
+    end
+endmodule
