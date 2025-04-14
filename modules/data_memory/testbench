@@ -1,0 +1,66 @@
+`timescale 1ns / 1ps
+module tb_data_memory;
+    reg clk, mem_write, mem_read;
+    reg [31:0] address, write_data;
+    wire [31:0] read_data;
+
+    // Instantiate the module
+    data_memory uut (
+        .clk(clk),
+        .mem_write(mem_write),
+        .mem_read(mem_read),
+        .address(address),
+        .write_data(write_data),
+        .read_data(read_data)
+    );
+
+    // Clock generation
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    // Test stimulus
+    initial begin
+        $monitor("Time=%0t clk=%b mem_write=%b mem_read=%b address=%h write_data=%h read_data=%h",
+                 $time, clk, mem_write, mem_read, address, write_data, read_data);
+
+        // Test 1: Initialize, no read/write, expect read_data = 0
+        mem_write = 0;
+        mem_read = 0;
+        address = 32'h00000000;
+        write_data = 32'h00000000;
+        #10;
+        // Expected: read_data = 32'h00000000
+
+        // Test 2: Write address 0 = 0xA
+        mem_write = 1;
+        mem_read = 0;
+        address = 32'h00000000;
+        write_data = 32'h0000000A;
+        #10;
+        // Expected: read_data = 32'h00000000 (no read)
+
+        // Test 3: Read address 0, expect 0xA
+        mem_write = 0;
+        mem_read = 1;
+        #10;
+        // Expected: read_data = 32'h0000000A
+
+        // Test 4: Write address 4 = 0x14
+        mem_write = 1;
+        mem_read = 0;
+        address = 32'h00000004;
+        write_data = 32'h00000014;
+        #10;
+        // Expected: read_data = 32'h00000000 (no read)
+
+        // Test 5: Read address 4, expect 0x14
+        mem_write = 0;
+        mem_read = 1;
+        #10;
+        // Expected: read_data = 32'h00000014
+
+        $finish;
+    end
+endmodule
