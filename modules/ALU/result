@@ -1,0 +1,7 @@
+Time=0:  a=0000000A b=00000005 alu_control=0000 result=00000000 zero=1
+Time=10: a=0000000A b=00000005 alu_control=0001 result=0000000F zero=0
+Time=20: a=0000000A b=00000005 alu_control=0010 result=0000000F zero=0
+Time=30: a=0000000A b=00000005 alu_control=0110 result=00000005 zero=0
+Time=40: a=00000005 b=00000005 alu_control=0110 result=00000000 zero=1
+Time=50: a=00000005 b=0000000A alu_control=0111 result=00000001 zero=0
+Time=60: a=00000005 b=0000000A alu_control=1100 result=FFFFFFF0 zero=0
