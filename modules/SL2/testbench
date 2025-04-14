@@ -1,0 +1,33 @@
+`timescale 1ns / 1ps
+module tb_shift_left_2;
+    reg [31:0] in;
+    wire [31:0] out;
+
+    // Instantiate the module
+    shift_left_2 uut (
+        .in(in),
+        .out(out)
+    );
+
+    // Test stimulus
+    initial begin
+        $monitor("Time=%0t in=%h out=%h", $time, in, out);
+
+        // Test 1: in = 1, expect out = 4
+        in = 32'h00000001;
+        #10;
+        // Expected: out = 32'h00000004
+
+        // Test 2: in = 2, expect out = 8
+        in = 32'h00000002;
+        #10;
+        // Expected: out = 32'h00000008
+
+        // Test 3: in = FFFFFFFF, expect out = FFFFFFFC
+        in = 32'hFFFFFFFF;
+        #10;
+        // Expected: out = 32'hFFFFFFFC
+
+        $finish;
+    end
+endmodule
