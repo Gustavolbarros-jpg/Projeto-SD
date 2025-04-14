@@ -1,0 +1,66 @@
+`timescale 1ns / 1ps
+module tb_alu;
+    reg [31:0] a, b;
+    reg [3:0] alu_control;
+    wire [31:0] result;
+    wire zero;
+
+    // Instantiate the module
+    alu uut (
+        .a(a),
+        .b(b),
+        .alu_control(alu_control),
+        .result(result),
+        .zero(zero)
+    );
+
+    // Test stimulus
+    initial begin
+        $monitor("Time=%0t a=%h b=%h alu_control=%b result=%h zero=%b", 
+                 $time, a, b, alu_control, result, zero);
+
+        a = 32'h0000000A;
+        b = 32'h00000005;
+
+        // Test 1: AND, expect result = 0x0, zero = 0
+        alu_control = 4'b0000;
+        #10;
+        // Expected: result = 32'h00000000 (0xA & 0x5), zero = 1
+
+        // Test 2: OR, expect result = 0xF, zero = 0
+        alu_control = 4'b0001;
+        #10;
+        // Expected: result = 32'h0000000F (0xA | 0x5), zero = 0
+
+        // Test 3: ADD, expect result = 0xF, zero = 0
+        alu_control = 4'b0010;
+        #10;
+        // Expected: result = 32'h0000000F (0xA + 0x5), zero = 0
+
+        // Test 4: SUB, expect result = 0x5, zero = 0
+        alu_control = 4'b0110;
+        #10;
+        // Expected: result = 32'h00000005 (0xA - 0x5), zero = 0
+
+        // Test 5: SUB (zero result), expect result = 0, zero = 1
+        a = 32'h00000005;
+        b = 32'h00000005;
+        alu_control = 4'b0110;
+        #10;
+        // Expected: result = 32'h00000000 (0x5 - 0x5), zero = 1
+
+        // Test 6: SLT, expect result = 1 (5 < 0xA), zero = 0
+        a = 32'h00000005;
+        b = 32'h0000000A;
+        alu_control = 4'b0111;
+        #10;
+        // Expected: result = 32'h00000001, zero = 0
+
+        // Test 7: NOR, expect result = ~(5 | 0xA), zero = 0
+        alu_control = 4'b1100;
+        #10;
+        // Expected: result = 32'hFFFFFFF0 (~(0x5 | 0xA)), zero = 0
+
+        $finish;
+    end
+endmodule
