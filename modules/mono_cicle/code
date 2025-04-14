@@ -1,0 +1,125 @@
+module mips_mono_simple (
+    input wire clk,
+    input wire reset
+);
+    wire [31:0] pc_out, pc_next, pc_plus_4;
+    wire [31:0] instruction;
+    wire [31:0] read_data1, read_data2, write_data;
+    wire [31:0] alu_result, alu_b, mem_data;
+    wire [31:0] imm_extended, imm_shifted, branch_addr;
+    wire [4:0] write_reg, write_reg_raw;
+    wire [3:0] alu_control;
+    wire reg_dst, alu_src, mem_to_reg, reg_write, mem_read, mem_write, branch;
+    wire [1:0] alu_op;
+    wire alu_zero;
+
+    pc program_counter (
+        .clk(clk),
+        .reset(reset),
+        .pc_in(pc_next),
+        .pc_out(pc_out)
+    );
+
+    pc_adder adder (
+        .pc_current(pc_out),
+        .pc_next(pc_plus_4)
+    );
+
+    instruction_memory imem (
+        .address(pc_out),
+        .instruction(instruction)
+    );
+
+    reg_file registers (
+        .clk(clk),
+        .we(reg_write),
+        .ra1(instruction[25:21]),
+        .ra2(instruction[20:16]),
+        .wa(write_reg),
+        .wd(write_data),
+        .rd1(read_data1),
+        .rd2(read_data2)
+    );
+
+    control_unit ctrl (
+        .opcode(instruction[31:26]),
+        .reg_dst(reg_dst),
+        .alu_src(alu_src),
+        .mem_to_reg(mem_to_reg),
+        .reg_write(reg_write),
+        .mem_read(mem_read),
+        .mem_write(mem_write),
+        .branch(branch),
+        .alu_op(alu_op)
+    );
+
+    sign_extend sext (
+        .in(instruction[15:0]),
+        .out(imm_extended)
+    );
+
+    shift_left_2 shift (
+        .in(imm_extended),
+        .out(imm_shifted)
+    );
+
+    branch_adder badder (
+        .pc_plus_4(pc_plus_4),
+        .imm_shifted(imm_shifted),
+        .branch_addr(branch_addr)
+    );
+
+    mux_pc_src pcsrc (
+        .pc_plus_4(pc_plus_4),
+        .branch_addr(branch_addr),
+        .branch(branch),
+        .zero(alu_zero),
+        .pc_next(pc_next)
+    );
+
+    mux_alu_src alusrc (
+        .reg_data(read_data2),
+        .imm_data(imm_extended),
+        .alu_src(alu_src),
+        .out(alu_b)
+    );
+
+    alu_control aluctrl (
+        .alu_op(alu_op),
+        .funct(instruction[5:0]),
+        .alu_control(alu_control)
+    );
+
+    alu alu_unit (
+        .a(read_data1),
+        .b(alu_b),
+        .alu_control(alu_control),
+        .result(alu_result),
+        .zero(alu_zero)
+    );
+
+    data_memory dmem (
+        .clk(clk),
+        .mem_write(mem_write),
+        .mem_read(mem_read),
+        .address(alu_result),
+        .write_data(read_data2),
+        .read_data(mem_data)
+    );
+
+    mux_write_reg wreg (
+        .rt(instruction[20:16]),
+        .rd(instruction[15:11]),
+        .reg_dst(reg_dst),
+        .out(write_reg_raw)
+    );
+
+    assign write_reg = reg_write ? write_reg_raw : 5'b0;
+
+    mux_write_data wdata (
+        .alu_result(alu_result),
+        .mem_data(mem_data),
+        .mem_to_reg(mem_to_reg),
+        .out(write_data)
+    );
+endmodule
