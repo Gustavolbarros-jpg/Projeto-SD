@@ -1,0 +1,38 @@
+timescale 1ns / 1ps
+module tb_instruction_memory;
+    reg [31:0] address;
+    wire [31:0] instruction;
+
+    // Instantiate the module
+    instruction_memory uut (
+        .address(address),
+        .instruction(instruction)
+    );
+
+    // Test stimulus
+    initial begin
+        $monitor("Time=%0t address=%h instruction=%h", $time, address, instruction);
+
+        // Test 1: address = 0, expect instruction = mem[0] = 2001000A
+        address = 32'h00000000;
+        #10;
+        // Expected: instruction = 32'h2001000A
+
+        // Test 2: address = 4, expect instruction = mem[1] = 20020014
+        address = 32'h00000004;
+        #10;
+        // Expected: instruction = 32'h20020014
+
+        // Test 3: address = 8, expect instruction = mem[2] = 20030032
+        address = 32'h00000008;
+        #10;
+        // Expected: instruction = 32'h20030032
+
+        // Test 4: address = 16, expect instruction = mem[4] = 00220820
+        address = 32'h00000010;
+        #10;
+        // Expected: instruction = 32'h00220820
+
+        $finish;
+    end
+endmodule
