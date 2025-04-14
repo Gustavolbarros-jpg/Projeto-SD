@@ -1,0 +1,7 @@
+Time=0:  alu_op=00 funct=000000 alu_control=0010
+Time=10: alu_op=01 funct=000000 alu_control=0110
+Time=20: alu_op=10 funct=100000 alu_control=0010
+Time=30: alu_op=10 funct=100010 alu_control=0110
+Time=40: alu_op=10 funct=100100 alu_control=0000
+Time=50: alu_op=10 funct=100101 alu_control=0001
+Time=60: alu_op=10 funct=101010 alu_control=0111
