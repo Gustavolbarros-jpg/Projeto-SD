@@ -1,0 +1,42 @@
+module data_memory (
+    input wire clk,
+    input wire mem_write, mem_read,
+    input wire [31:0] address,
+    input wire [31:0] write_data,
+    output reg [31:0] read_data
+);
+    reg [31:0] mem [0:63];
+    reg write_occurred;
+    reg used_positions [0:63]; // Vetor para rastrear posições usadas
+
+    initial begin
+        integer i;
+        for (i = 0; i < 64; i = i + 1) begin
+            mem[i] = 32'b0;
+            used_positions[i] = 1'b0; // Inicializa como não usadas
+        end
+        write_occurred = 1'b0;
+    end
+
+    always @(posedge clk) begin
+        if (mem_write) begin
+            mem[address >> 2] <= write_data;
+            used_positions[address >> 2] <= 1'b1; // Marca posição como usada
+            write_occurred <= 1'b1;
+        end
+    end
+
+    always @(address, mem_read) begin
+        if (mem_read)
+            read_data = mem[address >> 2];
+        else
+            read_data = 32'b0;
+    end
+
+    always @(posedge clk) begin
+        integer i;
+        if (write_occurred) begin
+            write_occurred <= 1'b0;
+        end
+    end
+endmodule
