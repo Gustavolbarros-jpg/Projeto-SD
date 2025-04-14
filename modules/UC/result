@@ -1,0 +1,6 @@
+Time=0:  opcode=000000 reg_dst=1 alu_src=0 mem_to_reg=0 reg_write=1 mem_read=0 mem_write=0 branch=0 alu_op=10
+Time=10: opcode=001000 reg_dst=0 alu_src=1 mem_to_reg=0 reg_write=1 mem_read=0 mem_write=0 branch=0 alu_op=00
+Time=20: opcode=100011 reg_dst=0 alu_src=1 mem_to_reg=1 reg_write=1 mem_read=1 mem_write=0 branch=0 alu_op=00
+Time=30: opcode=101011 reg_dst=0 alu_src=1 mem_to_reg=0 reg_write=0 mem_read=0 mem_write=1 branch=0 alu_op=00
+Time=40: opcode=000100 reg_dst=0 alu_src=0 mem_to_reg=0 reg_write=0 mem_read=0 mem_write=0 branch=1 alu_op=01
+Time=50: opcode=111111 reg_dst=0 alu_src=0 mem_to_reg=0 reg_write=0 mem_read=0 mem_write=0 branch=0 alu_op=00
