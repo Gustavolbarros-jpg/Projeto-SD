@@ -1,0 +1,4 @@
+Time=0:  in=000A out=0000000A
+Time=10: in=FFFF out=FFFFFFFF
+Time=20: in=8000 out=FFFF8000
+Time=30: in=7FFF out=00007FFF
