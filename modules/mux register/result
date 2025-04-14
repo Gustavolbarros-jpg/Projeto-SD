@@ -1,0 +1,2 @@
+Time=0:  rt=10 rd=20 reg_dst=0 out=10
+Time=10: rt=10 rd=20 reg_dst=1 out=20
