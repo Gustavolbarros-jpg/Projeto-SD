@@ -1,0 +1,3 @@
+Time=0:  pc_current=00000000 pc_next=00000004
+Time=10: pc_current=00000004 pc_next=00000008
+Time=20: pc_current=FFFFFFF0 pc_next=FFFFFFF4
