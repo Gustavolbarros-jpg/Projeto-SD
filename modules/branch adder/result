@@ -1,0 +1,2 @@
+Time=0:  pc_plus_4=00000004 imm_shifted=00000008 branch_addr=0000000C
+Time=10: pc_plus_4=00000010 imm_shifted=FFFFFFFC branch_addr=0000000C
