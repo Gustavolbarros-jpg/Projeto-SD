@@ -1,0 +1,8 @@
+module mux_pc_src (
+    input wire [31:0] pc_plus_4, branch_addr,
+    input wire branch, zero,
+    output wire [31:0] pc_next
+);
+    wire branch_taken = branch & zero;
+    assign pc_next = branch_taken ? branch_addr : pc_plus_4;
+endmodule
