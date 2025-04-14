@@ -1,0 +1,50 @@
+timescale 1ns / 1ps
+module tb_mux_pc_src;
+    reg [31:0] pc_plus_4, branch_addr;
+    reg branch, zero;
+    wire [31:0] pc_next;
+
+    // Instantiate the module
+    mux_pc_src uut (
+        .pc_plus_4(pc_plus_4),
+        .branch_addr(branch_addr),
+        .branch(branch),
+        .zero(zero),
+        .pc_next(pc_next)
+    );
+
+    // Test stimulus
+    initial begin
+        $monitor("Time=%0t pc_plus_4=%h branch_addr=%h branch=%b zero=%b pc_next=%h",
+                 $time, pc_plus_4, branch_addr, branch, zero, pc_next);
+
+        pc_plus_4 = 32'h00000004;
+        branch_addr = 32'h00000010;
+
+        // Test 1: branch=0, zero=0, expect pc_next = pc_plus_4
+        branch = 0;
+        zero = 0;
+        #10;
+        // Expected: pc_next = 32'h00000004
+
+        // Test 2: branch=1, zero=0, expect pc_next = pc_plus_4
+        branch = 1;
+        zero = 0;
+        #10;
+        // Expected: pc_next = 32'h00000004
+
+        // Test 3: branch=1, zero=1, expect pc_next = branch_addr
+        branch = 1;
+        zero = 1;
+        #10;
+        // Expected: pc_next = 32'h00000010
+
+        // Test 4: branch=0, zero=1, expect pc_next = pc_plus_4
+        branch = 0;
+        zero = 1;
+        #10;
+        // Expected: pc_next = 32'h00000004
+
+        $finish;
+    end
+endmodule
