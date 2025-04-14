@@ -1,0 +1,7 @@
+module mux_write_reg (
+    input wire [4:0] rt, rd,
+    input wire reg_dst,
+    output wire [4:0] out
+);
+    assign out = reg_dst ? rd : rt;
+endmodule
