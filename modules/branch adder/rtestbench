@@ -1,0 +1,32 @@
+`timescale 1ns / 1ps
+module tb_branch_adder;
+    reg [31:0] pc_plus_4, imm_shifted;
+    wire [31:0] branch_addr;
+
+    // Instantiate the module
+    branch_adder uut (
+        .pc_plus_4(pc_plus_4),
+        .imm_shifted(imm_shifted),
+        .branch_addr(branch_addr)
+    );
+
+    // Test stimulus
+    initial begin
+        $monitor("Time=%0t pc_plus_4=%h imm_shifted=%h branch_addr=%h",
+                 $time, pc_plus_4, imm_shifted, branch_addr);
+
+        // Test 1: Positive offset, expect branch_addr = 0xC
+        pc_plus_4 = 32'h00000004;
+        imm_shifted = 32'h00000008;
+        #10;
+        // Expected: branch_addr = 32'h0000000C (4 + 8)
+
+        // Test 2: Negative offset, expect branch_addr = 0xC
+        pc_plus_4 = 32'h00000010;
+        imm_shifted = 32'hFFFFFFFC;
+        #10;
+        // Expected: branch_addr = 32'h0000000C (16 - 4)
+
+        $finish;
+    end
+endmodule
