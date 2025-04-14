@@ -1,0 +1,2 @@
+Time=0:  alu_result=0000000A mem_data=00000014 mem_to_reg=0 out=0000000A
+Time=10: alu_result=0000000A mem_data=00000014 mem_to_reg=1 out=00000014
