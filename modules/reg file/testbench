@@ -1,0 +1,81 @@
+timescale 1ns / 1ps
+module tb_reg_file;
+    reg clk, we;
+    reg [4:0] ra1, ra2, wa;
+    reg [31:0] wd;
+    wire [31:0] rd1, rd2;
+
+    // Instantiate the module
+    reg_file uut (
+        .clk(clk),
+        .we(we),
+        .ra1(ra1),
+        .ra2(ra2),
+        .wa(wa),
+        .wd(wd),
+        .rd1(rd1),
+        .rd2(rd2)
+    );
+
+    // Clock generation
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    // Test stimulus
+    initial begin
+        $monitor("Time=%0t clk=%b we=%b ra1=%d ra2=%d wa=%d wd=%h rd1=%h rd2=%h", 
+                 $time, clk, we, ra1, ra2, wa, wd, rd1, rd2);
+        
+        // Test 1: Initialize, read r0, expect rd1 = rd2 = 0
+        we = 0;
+        ra1 = 5'd0;
+        ra2 = 5'd0;
+        wa = 5'd0;
+        wd = 32'h00000000;
+        #10;
+        // Expected: rd1 = 32'h00000000, rd2 = 32'h00000000
+        
+        // Test 2: Write r1 = 0xA, expect no read change yet
+        we = 1;
+        wa = 5'd1;
+        wd = 32'h0000000A;
+        #10;
+        // Expected: rd1 = 32'h00000000, rd2 = 32'h00000000 (reads not updated yet)
+        
+        // Test 3: Read r1, r0, expect rd1 = 0xA, rd2 = 0
+        we = 0;
+        ra1 = 5'd1;
+        ra2 = 5'd0;
+        #10;
+        // Expected: rd1 = 32'h0000000A, rd2 = 32'h00000000
+        
+        // Test 4: Write r2 = 0x14
+        we = 1;
+        wa = 5'd2;
+        wd = 32'h00000014;
+        #10;
+        // Expected: rd1 = 32'h0000000A, rd2 = 32'h00000000 (reads not updated yet)
+        
+        // Test 5: Read r1, r2, expect rd1 = 0xA, rd2 = 0x14
+        ra1 = 5'd1;
+        ra2 = 5'd2;
+        #10;
+        // Expected: rd1 = 32'h0000000A, rd2 = 32'h00000014
+        
+        // Test 6: Write r0 = FFFFFFFF (should not change), expect no effect
+        we = 1;
+        wa = 5'd0;
+        wd = 32'hFFFFFFFF;
+        #10;
+        // Expected: rd1 = 32'h0000000A, rd2 = 32'h00000014
+        
+        // Test 7: Read r0, expect rd1 = 0
+        ra1 = 5'd0;
+        #10;
+        // Expected: rd1 = 32'h00000000, rd2 = 32'h00000014
+        
+        $finish;
+    end
+endmodule
