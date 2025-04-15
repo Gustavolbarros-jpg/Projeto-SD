@@ -1,0 +1,66 @@
+`timescale 1ns / 1ps
+
+module tb_mips_mono_simple;
+
+    // Entradas do módulo principal
+    reg clk;
+    reg reset;
+
+    // Instanciação do módulo MIPS
+    mips_mono_simple uut (
+        .clk(clk),
+        .reset(reset)
+    );
+
+    // Parâmetros
+    localparam CLK_PERIOD = 10; // Período do clock em ns (100 MHz)
+
+    // Geração do clock
+    initial begin
+        clk = 0;
+        forever #(CLK_PERIOD/2) clk = ~clk;
+    end
+
+    // Contador para iterações do loop
+    integer iteration = 0;
+
+    // Inicialização e controle de reset
+    initial begin
+        reset = 1;
+        #20;
+        reset = 0;
+
+        // Limite máximo de ciclos para evitar loop infinito
+        repeat (1000) @(posedge clk);
+        $display("Encerrando por limite de ciclos.");
+        $finish;
+    end
+
+    // Monitoramento automático do loop de soma
+    initial begin
+        @(negedge reset); // espera o reset terminar
+        #1; // garante atualização dos registradores
+
+        forever begin
+            @(posedge clk);
+            #1;
+
+            // Imprime apenas após o primeiro carregamento
+            if (uut.registers.registers[1] != 0) begin
+                $display("Iteração %0d | $1 = %0d | $3 = %0d",
+                          iteration,
+                          uut.registers.registers[1],
+                          uut.registers.registers[3]);
+                iteration = iteration + 1;
+            end
+
+            // Parar a simulação se $1 == $3 (atingiu o valor final)
+            if (uut.registers.registers[1] == uut.registers.registers[3]) begin
+                $display("Fim: contador atingiu o limite.");
+                #10;
+                $finish;
+            end
+        end
+    end
+
+endmodule
