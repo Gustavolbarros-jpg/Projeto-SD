@@ -1,0 +1,371 @@
+// design.sv
+module pc (
+    input wire clk,
+    input wire reset,
+    input wire [31:0] pc_in,
+    output reg [31:0] pc_out
+);
+    always @(posedge clk) begin
+        if (reset)
+            pc_out <= 32'b0;
+        else
+            pc_out <= pc_in;
+    end
+endmodule
+
+module pc_adder (
+    input wire [31:0] pc_current,
+    output wire [31:0] pc_next
+);
+    assign pc_next = pc_current + 32'd4;
+endmodule
+
+module instruction_memory (
+    input wire [31:0] address,
+    output reg [31:0] instruction
+);
+    reg [31:0] mem [0:63];
+    initial begin
+        mem[0] = 32'h2001000A;  // addi $1, $0, 10
+        mem[1] = 32'h20020014;  // addi $2, $0, 20
+        mem[2] = 32'h20030032;  // addi $3, $0, 50
+        mem[3] = 32'hAC010000;  // sw $1, 0($0)
+        mem[4] = 32'h00220820;  // add $1, $1, $2
+        mem[5] = 32'h10230002;  // beq $1, $3, 2
+        mem[6] = 32'h1000FFFD;  // beq $0, $0, -3
+        mem[7] = 32'h00000000;  // nop
+    end
+    always @(address) begin
+        instruction = mem[address >> 2];
+    end
+endmodule
+
+module reg_file (
+    input wire clk,
+    input wire we,
+    input wire [4:0] ra1, ra2, wa,
+    input wire [31:0] wd,
+    output wire [31:0] rd1, rd2
+);
+    reg [31:0] registers [0:31];
+    initial begin
+        registers[0] = 32'b0;
+    end
+    assign rd1 = registers[ra1];
+    assign rd2 = registers[ra2];
+    always @(posedge clk) begin
+        if (we && wa != 5'b0)
+            registers[wa] <= wd;
+    end
+endmodule
+
+module alu (
+    input wire [31:0] a, b,
+    input wire [3:0] alu_control,
+    output reg [31:0] result,
+    output wire zero
+);
+    always @(*) begin
+        case (alu_control)
+            4'b0000: result = a & b;
+            4'b0001: result = a | b;
+            4'b0010: result = a + b;
+            4'b0110: result = a - b;
+            4'b0111: result = (a < b) ? 1 : 0;
+            4'b1100: result = ~(a | b);
+            default: result = 32'b0;
+        endcase
+    end
+    assign zero = (result == 32'b0);
+endmodule
+
+module control_unit (
+    input wire [5:0] opcode,
+    output reg reg_dst, alu_src, mem_to_reg, reg_write,
+    output reg mem_read, mem_write, branch,
+    output reg [1:0] alu_op
+);
+    always @(*) begin
+        case (opcode)
+            6'b000000: begin // Tipo R
+                reg_dst = 1; alu_src = 0; mem_to_reg = 0; reg_write = 1;
+                mem_read = 0; mem_write = 0; branch = 0; alu_op = 2'b10;
+            end
+            6'b001000: begin // addi
+                reg_dst = 0; alu_src = 1; mem_to_reg = 0; reg_write = 1;
+                mem_read = 0; mem_write = 0; branch = 0; alu_op = 2'b00;
+            end
+            6'b100011: begin // lw
+                reg_dst = 0; alu_src = 1; mem_to_reg = 1; reg_write = 1;
+                mem_read = 1; mem_write = 0; branch = 0; alu_op = 2'b00;
+            end
+            6'b101011: begin // sw
+                reg_dst = 0; alu_src = 1; mem_to_reg = 0; reg_write = 0;
+                mem_read = 0; mem_write = 1; branch = 0; alu_op = 2'b00;
+            end
+            6'b000100: begin // beq
+                reg_dst = 0; alu_src = 0; mem_to_reg = 0; reg_write = 0;
+                mem_read = 0; mem_write = 0; branch = 1; alu_op = 2'b01;
+            end
+            default: begin
+                reg_dst = 0; alu_src = 0; mem_to_reg = 0; reg_write = 0;
+                mem_read = 0; mem_write = 0; branch = 0; alu_op = 2'b00;
+            end
+        endcase
+    end
+endmodule
+
+module sign_extend (
+    input wire [15:0] in,
+    output wire [31:0] out
+);
+    assign out = {{16{in[15]}}, in};
+endmodule
+
+`timescale 1ns / 1ps
+
+
+`timescale 1ns / 1ps
+
+// ... outros módulos em design.sv ...
+
+module data_memory (
+    input wire clk,
+    input wire mem_write, mem_read,
+    input wire [31:0] address,
+    input wire [31:0] write_data,
+    output reg [31:0] read_data
+);
+    reg [31:0] mem [0:63];
+    reg write_occurred;
+    reg used_positions [0:63]; // Vetor para rastrear posições usadas
+
+    initial begin
+        integer i;
+        for (i = 0; i < 64; i = i + 1) begin
+            mem[i] = 32'b0;
+            used_positions[i] = 1'b0; // Inicializa como não usadas
+        end
+        write_occurred = 1'b0;
+    end
+
+    always @(posedge clk) begin
+        if (mem_write) begin
+            mem[address >> 2] <= write_data;
+            used_positions[address >> 2] <= 1'b1; // Marca posição como usada
+            write_occurred <= 1'b1;
+        end
+    end
+
+    always @(address, mem_read) begin
+        if (mem_read)
+            read_data = mem[address >> 2];
+        else
+            read_data = 32'b0;
+    end
+
+    always @(posedge clk) begin
+        integer i;
+        if (write_occurred) begin
+            write_occurred <= 1'b0;
+        end
+    end
+endmodule
+
+// ... outros módulos ...
+module alu_control (
+    input wire [1:0] alu_op,
+    input wire [5:0] funct,
+    output reg [3:0] alu_control
+);
+    always @(*) begin
+        case (alu_op)
+            2'b00: alu_control = 4'b0010; // ADD
+            2'b01: alu_control = 4'b0110; // SUB
+            2'b10: begin // Tipo R
+                case (funct)
+                    6'b100000: alu_control = 4'b0010; // ADD
+                    6'b100010: alu_control = 4'b0110; // SUB
+                    6'b100100: alu_control = 4'b0000; // AND
+                    6'b100101: alu_control = 4'b0001; // OR
+                    6'b101010: alu_control = 4'b0111; // SLT
+                    default: alu_control = 4'b0000;
+                endcase
+            end
+            default: alu_control = 4'b0000;
+        endcase
+    end
+endmodule
+
+module mux_alu_src (
+    input wire [31:0] reg_data, imm_data,
+    input wire alu_src,
+    output wire [31:0] out
+);
+    assign out = alu_src ? imm_data : reg_data;
+endmodule
+
+module mux_write_reg (
+    input wire [4:0] rt, rd,
+    input wire reg_dst,
+    output wire [4:0] out
+);
+    assign out = reg_dst ? rd : rt;
+endmodule
+
+module mux_write_data (
+    input wire [31:0] alu_result, mem_data,
+    input wire mem_to_reg,
+    output wire [31:0] out
+);
+    assign out = mem_to_reg ? mem_data : alu_result;
+endmodule
+
+module branch_adder (
+    input wire [31:0] pc_plus_4, imm_shifted,
+    output wire [31:0] branch_addr
+);
+    assign branch_addr = pc_plus_4 + imm_shifted;
+endmodule
+
+module mux_pc_src (
+    input wire [31:0] pc_plus_4, branch_addr,
+    input wire branch, zero,
+    output wire [31:0] pc_next
+);
+    wire branch_taken = branch & zero;
+    assign pc_next = branch_taken ? branch_addr : pc_plus_4;
+endmodule
+
+module shift_left_2 (
+    input wire [31:0] in,
+    output wire [31:0] out
+);
+    assign out = in << 2;
+endmodule
+
+module mips_mono_simple (
+    input wire clk,
+    input wire reset
+);
+    wire [31:0] pc_out, pc_next, pc_plus_4;
+    wire [31:0] instruction;
+    wire [31:0] read_data1, read_data2, write_data;
+    wire [31:0] alu_result, alu_b, mem_data;
+    wire [31:0] imm_extended, imm_shifted, branch_addr;
+    wire [4:0] write_reg, write_reg_raw;
+    wire [3:0] alu_control;
+    wire reg_dst, alu_src, mem_to_reg, reg_write, mem_read, mem_write, branch;
+    wire [1:0] alu_op;
+    wire alu_zero;
+
+    pc program_counter (
+        .clk(clk),
+        .reset(reset),
+        .pc_in(pc_next),
+        .pc_out(pc_out)
+    );
+
+    pc_adder adder (
+        .pc_current(pc_out),
+        .pc_next(pc_plus_4)
+    );
+
+    instruction_memory imem (
+        .address(pc_out),
+        .instruction(instruction)
+    );
+
+    reg_file registers (
+        .clk(clk),
+        .we(reg_write),
+        .ra1(instruction[25:21]),
+        .ra2(instruction[20:16]),
+        .wa(write_reg),
+        .wd(write_data),
+        .rd1(read_data1),
+        .rd2(read_data2)
+    );
+
+    control_unit ctrl (
+        .opcode(instruction[31:26]),
+        .reg_dst(reg_dst),
+        .alu_src(alu_src),
+        .mem_to_reg(mem_to_reg),
+        .reg_write(reg_write),
+        .mem_read(mem_read),
+        .mem_write(mem_write),
+        .branch(branch),
+        .alu_op(alu_op)
+    );
+
+    sign_extend sext (
+        .in(instruction[15:0]),
+        .out(imm_extended)
+    );
+
+    shift_left_2 shift (
+        .in(imm_extended),
+        .out(imm_shifted)
+    );
+
+    branch_adder badder (
+        .pc_plus_4(pc_plus_4),
+        .imm_shifted(imm_shifted),
+        .branch_addr(branch_addr)
+    );
+
+    mux_pc_src pcsrc (
+        .pc_plus_4(pc_plus_4),
+        .branch_addr(branch_addr),
+        .branch(branch),
+        .zero(alu_zero),
+        .pc_next(pc_next)
+    );
+
+    mux_alu_src alusrc (
+        .reg_data(read_data2),
+        .imm_data(imm_extended),
+        .alu_src(alu_src),
+        .out(alu_b)
+    );
+
+    alu_control aluctrl (
+        .alu_op(alu_op),
+        .funct(instruction[5:0]),
+        .alu_control(alu_control)
+    );
+
+    alu alu_unit (
+        .a(read_data1),
+        .b(alu_b),
+        .alu_control(alu_control),
+        .result(alu_result),
+        .zero(alu_zero)
+    );
+
+    data_memory dmem (
+        .clk(clk),
+        .mem_write(mem_write),
+        .mem_read(mem_read),
+        .address(alu_result),
+        .write_data(read_data2),
+        .read_data(mem_data)
+    );
+
+    mux_write_reg wreg (
+        .rt(instruction[20:16]),
+        .rd(instruction[15:11]),
+        .reg_dst(reg_dst),
+        .out(write_reg_raw)
+    );
+
+    assign write_reg = reg_write ? write_reg_raw : 5'b0;
+
+    mux_write_data wdata (
+        .alu_result(alu_result),
+        .mem_data(mem_data),
+        .mem_to_reg(mem_to_reg),
+        .out(write_data)
+    );
+endmodule
